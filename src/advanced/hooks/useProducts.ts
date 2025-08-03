@@ -1,18 +1,54 @@
-// TODO: 상품 관리 Hook
-// 힌트:
-// 1. 상품 목록 상태 관리 (localStorage 연동 고려)
-// 2. 상품 CRUD 작업
-// 3. 재고 업데이트
-// 4. 할인 규칙 추가/삭제
-//
-// 반환할 값:
-// - products: 상품 배열
-// - updateProduct: 상품 정보 수정
-// - addProduct: 새 상품 추가
-// - updateProductStock: 재고 수정
-// - addProductDiscount: 할인 규칙 추가
-// - removeProductDiscount: 할인 규칙 삭제
+import { useAtom } from "jotai";
+import { useCallback } from "react";
+import { productsAtom } from "../models/productAtoms";
 
-export function useProducts() {
-  // TODO: 구현
-}
+import { Product } from "../../types";
+import { generateProductId, validateProductData } from "../utils/productUtils";
+
+export const useProducts = () => {
+  const [products, setProducts] = useAtom(productsAtom);
+
+  // 상품 추가
+  const addProduct = useCallback((productData: Omit<Product, "id">) => {
+    if (!validateProductData(productData)) {
+      throw new Error("Invalid product data");
+    }
+
+    const newProduct: Product = {
+      ...productData,
+      id: generateProductId(),
+    };
+
+    setProducts((prev: Product[]) => [...prev, newProduct]);
+    return newProduct;
+  }, []);
+
+  // 상품 수정
+  const updateProduct = useCallback((id: string, updates: Partial<Product>) => {
+    setProducts((prev: Product[]) =>
+      prev.map((product: Product) =>
+        product.id === id ? { ...product, ...updates } : product
+      )
+    );
+  }, []);
+
+  const deleteProduct = useCallback((productId: string) => {
+    setProducts((prev) => prev.filter((p) => p.id !== productId));
+  }, []);
+
+  // 상품 삭제
+  const removeProduct = useCallback((id: string) => {
+    setProducts((prev: Product[]) =>
+      prev.filter((product: Product) => product.id !== id)
+    );
+  }, []);
+
+  return {
+    products,
+
+    addProduct,
+    updateProduct,
+    deleteProduct,
+    removeProduct,
+  };
+};

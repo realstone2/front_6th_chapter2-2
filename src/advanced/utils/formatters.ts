@@ -1,28 +1,11 @@
 import { CartItem, Product } from "../../types";
 
-/**
- * 가격 포맷팅 (관리자 모드 지원)
- */
-export const formatPrice = (
-  price: number,
-  isAdmin: boolean = false,
-  product?: Product,
-  cart?: CartItem[]
-): string => {
-  if (product && cart) {
-    const cartItem = cart.find((item) => item.product.id === product.id);
-    const remaining = product.stock - (cartItem?.quantity || 0);
-
-    if (remaining <= 0) {
-      return "품절";
-    }
+export const formatPrice = (price: number, isSoldOut: boolean): string => {
+  if (isSoldOut) {
+    return "SOLD OUT";
   }
 
-  if (isAdmin) {
-    return `${price.toLocaleString()}원`;
-  }
-
-  return `${price.toLocaleString()}원`;
+  return price.toLocaleString();
 };
 
 /**

@@ -15,10 +15,9 @@
 // - CouponForm: 새 쿠폰 추가 폼
 // - CouponList: 쿠폰 목록 표시
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { CartItem, Coupon, Product } from "../../types";
-import { formatPrice } from "../utils/formatters";
-import { getRemainingStock } from "../utils/productUtils";
+import { displayPrice } from "../utils/formatters";
 
 interface AdminPageProps {
   products: Product[];
@@ -28,11 +27,12 @@ interface AdminPageProps {
     message: string,
     type: "error" | "success" | "warning"
   ) => void;
-  handleDeleteProduct: (id: string) => void;
-  deleteCoupon: (code: string) => void;
   addProduct: (productData: Omit<Product, "id">) => Product;
   updateProduct: (id: string, updates: Partial<Product>) => void;
-  addCoupon: (coupon: Coupon) => void;
+  deleteProduct: (id: string) => void;
+  setCoupons: (coupons: Coupon[] | ((prev: Coupon[]) => Coupon[])) => void;
+  selectedCoupon: Coupon | null;
+  setSelectedCoupon: (coupon: Coupon | null) => void;
 }
 
 export function AdminPage({
@@ -40,11 +40,12 @@ export function AdminPage({
   coupons,
   cart,
   addNotification,
-  handleDeleteProduct,
-  deleteCoupon,
   addProduct,
   updateProduct,
-  addCoupon,
+  deleteProduct,
+  setCoupons,
+  selectedCoupon,
+  setSelectedCoupon,
 }: AdminPageProps) {
   // 내부 상태 관리
   const [activeTab, setActiveTab] = useState<"products" | "coupons">(
@@ -122,12 +123,14 @@ export function AdminPage({
     e.preventDefault();
     if (editingProduct && editingProduct !== "new") {
       updateProduct(editingProduct, productForm);
+      addNotification("상품이 수정되었습니다.", "success");
       setEditingProduct(null);
     } else {
       addProduct({
         ...productForm,
         discounts: productForm.discounts,
       });
+      addNotification("상품이 추가되었습니다.", "success");
     }
     setProductForm({
       name: "",
@@ -152,6 +155,59 @@ export function AdminPage({
     });
     setShowCouponForm(false);
   };
+
+  // 상품 추가
+  const handleAddProduct = useCallback(
+    (newProduct: Omit<Product, "id">) => {
+      addProduct(newProduct);
+      addNotification("상품이 추가되었습니다.", "success");
+    },
+    [addProduct, addNotification]
+  );
+
+  // 상품 수정
+  const handleUpdateProduct = useCallback(
+    (productId: string, updates: Partial<Product>) => {
+      updateProduct(productId, updates);
+      addNotification("상품이 수정되었습니다.", "success");
+    },
+    [updateProduct, addNotification]
+  );
+
+  // 상품 삭제
+  const handleDeleteProduct = useCallback(
+    (productId: string) => {
+      deleteProduct(productId);
+      addNotification("상품이 삭제되었습니다.", "success");
+    },
+    [deleteProduct, addNotification]
+  );
+
+  // 쿠폰 추가
+  const addCoupon = useCallback(
+    (newCoupon: Coupon) => {
+      const existingCoupon = coupons.find((c) => c.code === newCoupon.code);
+      if (existingCoupon) {
+        addNotification("이미 존재하는 쿠폰 코드입니다.", "error");
+        return;
+      }
+      setCoupons((prev) => [...prev, newCoupon]);
+      addNotification("쿠폰이 추가되었습니다.", "success");
+    },
+    [coupons, addNotification, setCoupons]
+  );
+
+  // 쿠폰 삭제
+  const deleteCoupon = useCallback(
+    (couponCode: string) => {
+      setCoupons((prev) => prev.filter((c) => c.code !== couponCode));
+      if (selectedCoupon?.code === couponCode) {
+        setSelectedCoupon(null);
+      }
+      addNotification("쿠폰이 삭제되었습니다.", "success");
+    },
+    [selectedCoupon, addNotification, setCoupons, setSelectedCoupon]
+  );
 
   return (
     <div className="max-w-6xl mx-auto">
@@ -226,10 +282,9 @@ export function AdminPage({
                       {product.name}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {`${formatPrice(
-                        product.price,
-                        !getRemainingStock(product, cart)
-                      )}원`}
+                      {displayPrice(product, {
+                        suffix: "원",
+                      })}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       <span

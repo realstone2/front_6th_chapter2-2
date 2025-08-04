@@ -1,51 +1,17 @@
 import { useState, useCallback, useEffect } from "react";
 import { CartItem, Coupon, Product } from "../types";
 
-interface ProductWithUI extends Product {
-  description?: string;
-  isRecommended?: boolean;
-}
+import { useProducts } from "./hooks/useProducts";
+import { formatPrice } from "./utils/formatters";
+import { getRemainingStock } from "./utils/productUtils";
+import { useDebouncedCallback } from "./utils/hooks/useDebounce";
+import useFilterSearchParams from "../hooks/useFilterSearchParams";
 
 interface Notification {
   id: string;
   message: string;
   type: "error" | "success" | "warning";
 }
-
-// 초기 데이터
-const initialProducts: ProductWithUI[] = [
-  {
-    id: "p1",
-    name: "상품1",
-    price: 10000,
-    stock: 20,
-    discounts: [
-      { quantity: 10, rate: 0.1 },
-      { quantity: 20, rate: 0.2 },
-    ],
-    description: "최고급 품질의 프리미엄 상품입니다.",
-  },
-  {
-    id: "p2",
-    name: "상품2",
-    price: 20000,
-    stock: 20,
-    discounts: [{ quantity: 10, rate: 0.15 }],
-    description: "다양한 기능을 갖춘 실용적인 상품입니다.",
-    isRecommended: true,
-  },
-  {
-    id: "p3",
-    name: "상품3",
-    price: 30000,
-    stock: 20,
-    discounts: [
-      { quantity: 10, rate: 0.2 },
-      { quantity: 30, rate: 0.25 },
-    ],
-    description: "대용량과 고성능을 자랑하는 상품입니다.",
-  },
-];
 
 const initialCoupons: Coupon[] = [
   {
@@ -63,17 +29,13 @@ const initialCoupons: Coupon[] = [
 ];
 
 const App = () => {
-  const [products, setProducts] = useState<ProductWithUI[]>(() => {
-    const saved = localStorage.getItem("products");
-    if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch {
-        return initialProducts;
-      }
-    }
-    return initialProducts;
-  });
+  const {
+    products,
+
+    addProduct,
+    updateProduct,
+    deleteProduct,
+  } = useProducts();
 
   const [cart, setCart] = useState<CartItem[]>(() => {
     const saved = localStorage.getItem("cart");
@@ -107,8 +69,22 @@ const App = () => {
     "products"
   );
   const [showProductForm, setShowProductForm] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+  const { filterSearchParams, setFilterSearchParams } = useFilterSearchParams();
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+
+    if (!value) {
+      setFilterSearchParams({ searchTerm: "" });
+      return;
+    }
+
+    debouncedSetSearchTerm(value);
+  };
+
+  const debouncedSetSearchTerm = useDebouncedCallback((value: string) => {
+    setFilterSearchParams({ searchTerm: value });
+  }, 500);
 
   // Admin
   const [editingProduct, setEditingProduct] = useState<string | null>(null);
@@ -126,21 +102,6 @@ const App = () => {
     discountType: "amount" as "amount" | "percentage",
     discountValue: 0,
   });
-
-  const formatPrice = (price: number, productId?: string): string => {
-    if (productId) {
-      const product = products.find((p) => p.id === productId);
-      if (product && getRemainingStock(product) <= 0) {
-        return "SOLD OUT";
-      }
-    }
-
-    if (isAdmin) {
-      return `${price.toLocaleString()}원`;
-    }
-
-    return `₩${price.toLocaleString()}`;
-  };
 
   const getMaxApplicableDiscount = (item: CartItem): number => {
     const { discounts } = item.product;
@@ -200,13 +161,6 @@ const App = () => {
     };
   };
 
-  const getRemainingStock = (product: Product): number => {
-    const cartItem = cart.find((item) => item.product.id === product.id);
-    const remaining = product.stock - (cartItem?.quantity || 0);
-
-    return remaining;
-  };
-
   const addNotification = useCallback(
     (message: string, type: "error" | "success" | "warning" = "success") => {
       const id = Date.now().toString();
@@ -227,10 +181,6 @@ const App = () => {
   }, [cart]);
 
   useEffect(() => {
-    localStorage.setItem("products", JSON.stringify(products));
-  }, [products]);
-
-  useEffect(() => {
     localStorage.setItem("coupons", JSON.stringify(coupons));
   }, [coupons]);
 
@@ -242,16 +192,9 @@ const App = () => {
     }
   }, [cart]);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearchTerm(searchTerm);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [searchTerm]);
-
   const addToCart = useCallback(
-    (product: ProductWithUI) => {
-      const remainingStock = getRemainingStock(product);
+    (product: Product) => {
+      const remainingStock = getRemainingStock(product, cart);
       if (remainingStock <= 0) {
         addNotification("재고가 부족합니다!", "error");
         return;
@@ -349,36 +292,28 @@ const App = () => {
     setSelectedCoupon(null);
   }, [addNotification]);
 
-  const addProduct = useCallback(
-    (newProduct: Omit<ProductWithUI, "id">) => {
-      const product: ProductWithUI = {
-        ...newProduct,
-        id: `p${Date.now()}`,
-      };
-      setProducts((prev) => [...prev, product]);
+  const handleAddProduct = useCallback(
+    (newProduct: Omit<Product, "id">) => {
+      addProduct(newProduct);
       addNotification("상품이 추가되었습니다.", "success");
     },
-    [addNotification]
+    [addProduct, addNotification]
   );
 
-  const updateProduct = useCallback(
-    (productId: string, updates: Partial<ProductWithUI>) => {
-      setProducts((prev) =>
-        prev.map((product) =>
-          product.id === productId ? { ...product, ...updates } : product
-        )
-      );
+  const handleUpdateProduct = useCallback(
+    (productId: string, updates: Partial<Product>) => {
+      updateProduct(productId, updates);
       addNotification("상품이 수정되었습니다.", "success");
     },
-    [addNotification]
+    [updateProduct, addNotification]
   );
 
-  const deleteProduct = useCallback(
+  const handleDeleteProduct = useCallback(
     (productId: string) => {
-      setProducts((prev) => prev.filter((p) => p.id !== productId));
+      deleteProduct(productId);
       addNotification("상품이 삭제되었습니다.", "success");
     },
-    [addNotification]
+    [deleteProduct, addNotification]
   );
 
   const addCoupon = useCallback(
@@ -408,10 +343,10 @@ const App = () => {
   const handleProductSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (editingProduct && editingProduct !== "new") {
-      updateProduct(editingProduct, productForm);
+      handleUpdateProduct(editingProduct, productForm);
       setEditingProduct(null);
     } else {
-      addProduct({
+      handleAddProduct({
         ...productForm,
         discounts: productForm.discounts,
       });
@@ -439,7 +374,7 @@ const App = () => {
     setShowCouponForm(false);
   };
 
-  const startEditProduct = (product: ProductWithUI) => {
+  const startEditProduct = (product: Product) => {
     setEditingProduct(product.id);
     setProductForm({
       name: product.name,
@@ -453,16 +388,15 @@ const App = () => {
 
   const totals = calculateCartTotal();
 
-  const filteredProducts = debouncedSearchTerm
+  const searchTerm = filterSearchParams.searchTerm ?? "";
+  const filteredProducts = searchTerm
     ? products.filter(
         (product) =>
-          product.name
-            .toLowerCase()
-            .includes(debouncedSearchTerm.toLowerCase()) ||
+          product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
           (product.description &&
             product.description
               .toLowerCase()
-              .includes(debouncedSearchTerm.toLowerCase()))
+              .includes(searchTerm.toLowerCase()))
       )
     : products;
 
@@ -518,8 +452,8 @@ const App = () => {
                 <div className="ml-8 flex-1 max-w-md">
                   <input
                     type="text"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
+                    defaultValue={searchTerm}
+                    onChange={handleSearchChange}
                     placeholder="상품 검색..."
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
                   />
@@ -653,7 +587,10 @@ const App = () => {
                               {product.name}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              {formatPrice(product.price, product.id)}
+                              {`${formatPrice(
+                                product.price,
+                                !getRemainingStock(product, cart)
+                              )}원`}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                               <span
@@ -679,7 +616,7 @@ const App = () => {
                                 수정
                               </button>
                               <button
-                                onClick={() => deleteProduct(product.id)}
+                                onClick={() => handleDeleteProduct(product.id)}
                                 className="text-red-600 hover:text-red-900"
                               >
                                 삭제
@@ -1179,13 +1116,13 @@ const App = () => {
                 {filteredProducts.length === 0 ? (
                   <div className="text-center py-12">
                     <p className="text-gray-500">
-                      "{debouncedSearchTerm}"에 대한 검색 결과가 없습니다.
+                      "{searchTerm}"에 대한 검색 결과가 없습니다.
                     </p>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {filteredProducts.map((product) => {
-                      const remainingStock = getRemainingStock(product);
+                      const remainingStock = getRemainingStock(product, cart);
 
                       return (
                         <div
@@ -1239,7 +1176,10 @@ const App = () => {
                             {/* 가격 정보 */}
                             <div className="mb-3">
                               <p className="text-lg font-bold text-gray-900">
-                                {formatPrice(product.price, product.id)}
+                                {`₩${formatPrice(
+                                  product.price,
+                                  !getRemainingStock(product, cart)
+                                )}`}
                               </p>
                               {product.discounts.length > 0 && (
                                 <p className="text-xs text-gray-500">

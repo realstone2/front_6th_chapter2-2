@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useState, useEffect } from "react";
 
 import { Product } from "../../types";
 import { generateProductId, validateProductData } from "../utils/productUtils";
@@ -6,7 +6,7 @@ import { initialProducts } from "../constants/product";
 import useFilterSearchParams from "../../hooks/useFilterSearchParams";
 
 export const useProducts = () => {
-  const [products, setProducts] = useState<Product[]>(() => {
+  const [products, _setProducts] = useState<Product[]>(() => {
     const saved = localStorage.getItem("products");
     if (saved) {
       try {
@@ -17,6 +17,19 @@ export const useProducts = () => {
     }
     return initialProducts;
   });
+
+  const setProducts: React.Dispatch<React.SetStateAction<Product[]>> =
+    useCallback(
+      (products) => {
+        _setProducts((prev) => {
+          const newValue =
+            typeof products === "function" ? products(prev) : products;
+          localStorage.setItem("products", JSON.stringify(newValue));
+          return newValue;
+        });
+      },
+      [_setProducts]
+    );
 
   const { filterSearchParams } = useFilterSearchParams();
 

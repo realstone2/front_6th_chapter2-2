@@ -23,10 +23,22 @@ export function useSearchParams(): [
       setSearchParamsState(new URLSearchParams(window.location.search));
     };
 
+    const handleSearchParamsChanged = (event: CustomEvent) => {
+      setSearchParamsState(event.detail.searchParams);
+    };
+
     window.addEventListener("popstate", handlePopState);
+    window.addEventListener(
+      "searchParamsChanged",
+      handleSearchParamsChanged as EventListener
+    );
 
     return () => {
       window.removeEventListener("popstate", handlePopState);
+      window.removeEventListener(
+        "searchParamsChanged",
+        handleSearchParamsChanged as EventListener
+      );
     };
   }, []);
 
@@ -45,7 +57,13 @@ export function useSearchParams(): [
       }${window.location.hash}`;
 
       history.replaceState(null, "", newUrl);
-      setSearchParamsState(newSearchParams);
+
+      // replaceState 후 상태 동기화를 위한 커스텀 이벤트 발생
+      window.dispatchEvent(
+        new CustomEvent("searchParamsChanged", {
+          detail: { searchParams: newSearchParams },
+        })
+      );
     },
     []
   );

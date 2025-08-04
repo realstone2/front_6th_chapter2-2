@@ -5,6 +5,12 @@ import useFilterSearchParams from "../hooks/useFilterSearchParams";
 import { AdminPage } from "./components/AdminPage";
 import { MainPage } from "./components/MainPage";
 import { useProducts } from "./hooks/useProducts";
+import { useCart } from "./hooks/useCart";
+import {
+  calculateCartTotal,
+  calculateItemTotal,
+  getCartItemCount,
+} from "./utils/cartUtils";
 import { useDebouncedCallback } from "./utils/hooks/useDebounce";
 
 interface Notification {
@@ -36,18 +42,6 @@ const App = () => {
     updateProduct,
     deleteProduct,
   } = useProducts();
-
-  const [cart, setCart] = useState<CartItem[]>(() => {
-    const saved = localStorage.getItem("cart");
-    if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch {
-        return [];
-      }
-    }
-    return [];
-  });
 
   const [coupons, setCoupons] = useState<Coupon[]>(() => {
     const saved = localStorage.getItem("coupons");
@@ -81,64 +75,6 @@ const App = () => {
     setFilterSearchParams({ searchTerm: value });
   }, 500);
 
-  const getMaxApplicableDiscount = (item: CartItem): number => {
-    const { discounts } = item.product;
-    const { quantity } = item;
-
-    const baseDiscount = discounts.reduce((maxDiscount, discount) => {
-      return quantity >= discount.quantity && discount.rate > maxDiscount
-        ? discount.rate
-        : maxDiscount;
-    }, 0);
-
-    const hasBulkPurchase = cart.some((cartItem) => cartItem.quantity >= 10);
-    if (hasBulkPurchase) {
-      return Math.min(baseDiscount + 0.05, 0.5); // 대량 구매 시 추가 5% 할인
-    }
-
-    return baseDiscount;
-  };
-
-  const calculateItemTotal = (item: CartItem): number => {
-    const { price } = item.product;
-    const { quantity } = item;
-    const discount = getMaxApplicableDiscount(item);
-
-    return Math.round(price * quantity * (1 - discount));
-  };
-
-  const calculateCartTotal = (): {
-    totalBeforeDiscount: number;
-    totalAfterDiscount: number;
-  } => {
-    let totalBeforeDiscount = 0;
-    let totalAfterDiscount = 0;
-
-    cart.forEach((item) => {
-      const itemPrice = item.product.price * item.quantity;
-      totalBeforeDiscount += itemPrice;
-      totalAfterDiscount += calculateItemTotal(item);
-    });
-
-    if (selectedCoupon) {
-      if (selectedCoupon.discountType === "amount") {
-        totalAfterDiscount = Math.max(
-          0,
-          totalAfterDiscount - selectedCoupon.discountValue
-        );
-      } else {
-        totalAfterDiscount = Math.round(
-          totalAfterDiscount * (1 - selectedCoupon.discountValue / 100)
-        );
-      }
-    }
-
-    return {
-      totalBeforeDiscount: Math.round(totalBeforeDiscount),
-      totalAfterDiscount: Math.round(totalAfterDiscount),
-    };
-  };
-
   const addNotification = useCallback(
     (message: string, type: "error" | "success" | "warning" = "success") => {
       const id = Date.now().toString();
@@ -151,24 +87,22 @@ const App = () => {
     []
   );
 
-  const [totalItemCount, setTotalItemCount] = useState(0);
+  const {
+    cart,
+    addToCart,
+    updateCartItemQuantity,
+    removeFromCart,
+    clearCart,
+    getProductRemainingStock,
+    isInCart,
+    getCartItem,
+  } = useCart(addNotification);
 
-  useEffect(() => {
-    const count = cart.reduce((sum, item) => sum + item.quantity, 0);
-    setTotalItemCount(count);
-  }, [cart]);
+  const totalItemCount = getCartItemCount(cart);
 
   useEffect(() => {
     localStorage.setItem("coupons", JSON.stringify(coupons));
   }, [coupons]);
-
-  useEffect(() => {
-    if (cart.length > 0) {
-      localStorage.setItem("cart", JSON.stringify(cart));
-    } else {
-      localStorage.removeItem("cart");
-    }
-  }, [cart]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -290,13 +224,17 @@ const App = () => {
               searchTerm: filterSearchParams.searchTerm ?? "",
             }}
             cart={cart}
-            setCart={setCart}
+            addToCart={addToCart}
+            updateCartItemQuantity={updateCartItemQuantity}
+            removeFromCart={removeFromCart}
+            clearCart={clearCart}
             selectedCoupon={selectedCoupon}
             setSelectedCoupon={setSelectedCoupon}
             addNotification={addNotification}
-            calculateCartTotal={calculateCartTotal}
-            calculateItemTotal={calculateItemTotal}
+            calculateCartTotal={() => calculateCartTotal(cart, selectedCoupon)}
+            calculateItemTotal={(item) => calculateItemTotal(item, cart)}
             coupons={coupons}
+            getProductRemainingStock={getProductRemainingStock}
           />
         )}
       </main>

@@ -1,11 +1,14 @@
-import { CartItem, Product } from "../../types";
+import { Product } from "../../types";
 
-export const formatPrice = (price: number, isSoldOut: boolean): string => {
-  if (isSoldOut) {
+export const displayPrice = (
+  product: Product,
+  { suffix = "", prefix = "" }: { suffix?: string; prefix?: string } = {}
+): string => {
+  if (product.stock <= 0) {
     return "SOLD OUT";
   }
 
-  return price.toLocaleString();
+  return `${prefix}${product.price.toLocaleString()}${suffix}`;
 };
 
 /**

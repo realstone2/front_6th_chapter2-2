@@ -94,9 +94,7 @@ const App = () => {
     removeFromCart,
     clearCart,
     getProductRemainingStock,
-    isInCart,
-    getCartItem,
-  } = useCart(addNotification);
+  } = useCart();
 
   const totalItemCount = getCartItemCount(cart);
 

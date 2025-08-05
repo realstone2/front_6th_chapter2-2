@@ -85,7 +85,7 @@ export function MainPage({
   // 쿠폰 적용
   const applyCoupon = useCallback(
     (coupon: Coupon) => {
-      const currentTotal = calculateCartTotal().totalAfterDiscount;
+      const currentTotal = calculateCartTotal().totalBeforeDiscount;
 
       if (currentTotal < 10000 && coupon.discountType === "percentage") {
         addNotification(

@@ -1,10 +1,11 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { Coupon } from "../types";
 
 import useFilterSearchParams from "../hooks/useFilterSearchParams";
 import { AdminPage } from "./components/AdminPage";
 import { MainPage } from "./components/MainPage";
 import { useCart } from "./hooks/useCart";
+import { useCoupons } from "./hooks/useCoupons";
 import { useProducts } from "./hooks/useProducts";
 import {
   calculateCartTotal,
@@ -19,21 +20,6 @@ interface Notification {
   type: "error" | "success" | "warning";
 }
 
-const initialCoupons: Coupon[] = [
-  {
-    name: "5000원 할인",
-    code: "AMOUNT5000",
-    discountType: "amount",
-    discountValue: 5000,
-  },
-  {
-    name: "10% 할인",
-    code: "PERCENT10",
-    discountType: "percentage",
-    discountValue: 10,
-  },
-];
-
 const App = () => {
   const {
     products,
@@ -43,17 +29,7 @@ const App = () => {
     deleteProduct,
   } = useProducts();
 
-  const [coupons, setCoupons] = useState<Coupon[]>(() => {
-    const saved = localStorage.getItem("coupons");
-    if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch {
-        return initialCoupons;
-      }
-    }
-    return initialCoupons;
-  });
+  const { coupons, addCoupon, removeCoupon } = useCoupons();
 
   const [selectedCoupon, setSelectedCoupon] = useState<Coupon | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -97,10 +73,6 @@ const App = () => {
   } = useCart();
 
   const totalItemCount = getCartItemCount(cart);
-
-  useEffect(() => {
-    localStorage.setItem("coupons", JSON.stringify(coupons));
-  }, [coupons]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -205,14 +177,12 @@ const App = () => {
           <AdminPage
             products={products}
             coupons={coupons}
-            cart={cart}
             addNotification={addNotification}
             addProduct={addProduct}
             updateProduct={updateProduct}
             deleteProduct={deleteProduct}
-            setCoupons={setCoupons}
-            selectedCoupon={selectedCoupon}
-            setSelectedCoupon={setSelectedCoupon}
+            addCoupon={addCoupon}
+            removeCoupon={removeCoupon}
           />
         ) : (
           <MainPage

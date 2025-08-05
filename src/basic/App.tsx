@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
-import { CartItem, Coupon } from "../types";
+import { Coupon } from "../types";
 
 import useFilterSearchParams from "../hooks/useFilterSearchParams";
 import { AdminPage } from "./components/AdminPage";
 import { MainPage } from "./components/MainPage";
-import { useProducts } from "./hooks/useProducts";
 import { useCart } from "./hooks/useCart";
+import { useProducts } from "./hooks/useProducts";
 import {
   calculateCartTotal,
   calculateItemTotal,

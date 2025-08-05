@@ -4,7 +4,7 @@ import { displayPrice } from "../utils/formatters";
 import { getRefinedProduct } from "../utils/productUtils";
 import { getRemainingStock } from "../utils/cartUtils";
 
-interface MainPageProps {
+interface ShopPageProps {
   products: Product[];
   filteredProducts: Product[];
   filterSearchParams: { searchTerm?: string };
@@ -28,7 +28,7 @@ interface MainPageProps {
   getProductRemainingStock: (product: Product) => number;
 }
 
-export function MainPage({
+export function ShopPage({
   products,
   filteredProducts,
   filterSearchParams,
@@ -43,7 +43,7 @@ export function MainPage({
   calculateCartTotal,
   calculateItemTotal,
   coupons,
-}: MainPageProps) {
+}: ShopPageProps) {
   // 장바구니에 상품 추가 (props로 받은 함수 사용)
   const handleAddToCart = useCallback(
     (product: Product) => {

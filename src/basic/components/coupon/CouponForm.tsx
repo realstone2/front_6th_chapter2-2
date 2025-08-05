@@ -1,6 +1,9 @@
 import { useState } from "react";
-import { Coupon } from "../../types";
-import { COUPON_FORM_INITIAL_STATE, COUPON_LIMITS } from "../constants/coupon";
+import { Coupon } from "../../../types";
+import {
+  COUPON_FORM_INITIAL_STATE,
+  COUPON_LIMITS,
+} from "../../constants/coupon";
 
 interface CouponFormProps {
   onSubmit: (coupon: Coupon) => void;

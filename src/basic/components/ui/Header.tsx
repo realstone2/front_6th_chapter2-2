@@ -1,7 +1,6 @@
-import { CartItem } from "../types";
-
-import useFilterSearchParams from "../hooks/useFilterSearchParams";
-import { useDebouncedCallback } from "./utils/hooks/useDebounce";
+import { CartItem } from "../../../types";
+import useFilterSearchParams from "../../../hooks/useFilterSearchParams";
+import { useDebouncedCallback } from "../../utils/hooks/useDebounce";
 
 export const Header = ({
   isAdmin,

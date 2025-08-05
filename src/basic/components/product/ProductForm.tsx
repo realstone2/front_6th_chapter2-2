@@ -1,5 +1,5 @@
 import React from "react";
-import { Discount } from "../../types";
+import { Discount } from "../../../types";
 
 interface ProductFormData {
   name: string;

@@ -3,7 +3,7 @@ import { Coupon } from "../types";
 
 import useFilterSearchParams from "../hooks/useFilterSearchParams";
 import { AdminPage } from "./pages/AdminPage";
-import { MainPage } from "./pages/MainPage";
+import { ShopPage } from "./pages/ShopPage";
 
 import { useCart } from "./hooks/useCart";
 import { useCoupons } from "./hooks/useCoupons";
@@ -87,7 +87,7 @@ const App = () => {
             removeCoupon={removeCoupon}
           />
         ) : (
-          <MainPage
+          <ShopPage
             products={products}
             filteredProducts={filteredProducts}
             filterSearchParams={{

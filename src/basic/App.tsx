@@ -2,9 +2,9 @@ import { useCallback, useState } from "react";
 import { Coupon } from "../types";
 
 import useFilterSearchParams from "../hooks/useFilterSearchParams";
-import { AdminPage } from "./components/AdminPage";
-import { MainPage } from "./components/MainPage";
-import { Header } from "./Header";
+import { AdminPage } from "./pages/AdminPage";
+import { MainPage } from "./pages/MainPage";
+
 import { useCart } from "./hooks/useCart";
 import { useCoupons } from "./hooks/useCoupons";
 import { useProducts } from "./hooks/useProducts";
@@ -13,7 +13,8 @@ import {
   calculateItemTotal,
   getCartItemCount,
 } from "./utils/cartUtils";
-import { NotificationList } from "./NotificationList";
+import { NotificationList } from "./components/ui/NotificationList";
+import { Header } from "./components/ui/Header";
 
 export interface Notification {
   id: string;

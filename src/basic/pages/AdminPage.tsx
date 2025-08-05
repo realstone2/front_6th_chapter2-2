@@ -18,7 +18,7 @@
 import { useState, useCallback } from "react";
 import { Coupon, Product } from "../../types";
 import { displayPrice } from "../utils/formatters";
-import { CouponManagement } from "./CouponManagement";
+import { CouponManagement } from "../components/coupon/CouponManagement";
 
 interface AdminPageProps {
   products: Product[];

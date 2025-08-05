@@ -1,4 +1,4 @@
-import { Notification } from "./App";
+import { Notification } from "../../App";
 
 export const NotificationList = ({
   notifications,

@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { Coupon } from "../../types";
+import { Coupon } from "../../../types";
 import { CouponForm } from "./CouponForm";
 import {
   getCouponDisplayText,
   validateCouponData,
   isCouponDuplicate,
-} from "../utils/couponUtils";
+} from "../../utils/couponUtils";
 
 interface CouponManagementProps {
   coupons: Coupon[];

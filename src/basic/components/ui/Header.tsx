@@ -1,17 +1,16 @@
 import { CartItem } from "../../../types";
 import useFilterSearchParams from "../../../hooks/useFilterSearchParams";
 import { useDebouncedCallback } from "../../utils/hooks/useDebounce";
+import { getCartItemCount } from "../../utils/cartUtils";
 
 export const Header = ({
   isAdmin,
   setIsAdmin,
   cart,
-  totalItemCount,
 }: {
   isAdmin: boolean;
   setIsAdmin: (isAdmin: boolean) => void;
   cart: CartItem[];
-  totalItemCount: number;
 }) => {
   const { filterSearchParams, setFilterSearchParams } = useFilterSearchParams();
 
@@ -77,7 +76,7 @@ export const Header = ({
                 </svg>
                 {cart.length > 0 && (
                   <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                    {totalItemCount}
+                    {getCartItemCount(cart)}
                   </span>
                 )}
               </div>

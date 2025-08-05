@@ -1,6 +1,5 @@
 import { useCallback, useState } from "react";
 import { CartItem, Product } from "../../types";
-import { getRemainingStock } from "../utils/cartUtils";
 
 export const useCart = () => {
   const [cart, _setCart] = useState<CartItem[]>(() => {
@@ -77,14 +76,6 @@ export const useCart = () => {
     setCart([]);
   }, [setCart]);
 
-  // 상품의 재고 확인
-  const getProductRemainingStock = useCallback(
-    (product: Product) => {
-      return getRemainingStock(product, cart);
-    },
-    [cart]
-  );
-
   // 장바구니에 상품이 있는지 확인
   const isInCart = useCallback(
     (productId: string) => {
@@ -107,7 +98,6 @@ export const useCart = () => {
     updateCartItemQuantity,
     removeFromCart,
     clearCart,
-    getProductRemainingStock,
     isInCart,
     getCartItem,
   };

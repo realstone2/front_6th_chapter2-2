@@ -7,7 +7,6 @@ import { ShopPage } from "./pages/ShopPage";
 import { Header } from "./components/ui/Header";
 import { NotificationList } from "./components/ui/NotificationList";
 import { useCart } from "./hooks/useCart";
-import { useProducts } from "./hooks/useProducts";
 
 export interface Notification {
   id: string;
@@ -16,14 +15,6 @@ export interface Notification {
 }
 
 const App = () => {
-  const {
-    products,
-    filteredProducts,
-    addProduct,
-    updateProduct,
-    deleteProduct,
-  } = useProducts();
-
   const [selectedCoupon, setSelectedCoupon] = useState<Coupon | null>(null);
 
   const [isAdmin, setIsAdmin] = useState(false);
@@ -41,8 +32,7 @@ const App = () => {
     []
   );
 
-  const { cart, addToCart, updateCartItemQuantity, removeFromCart, clearCart } =
-    useCart();
+  const { cart, updateCartItemQuantity, removeFromCart, clearCart } = useCart();
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -54,19 +44,10 @@ const App = () => {
 
       <main className="max-w-7xl mx-auto px-4 py-8">
         {isAdmin ? (
-          <AdminPage
-            products={products}
-            addNotification={addNotification}
-            addProduct={addProduct}
-            updateProduct={updateProduct}
-            deleteProduct={deleteProduct}
-          />
+          <AdminPage addNotification={addNotification} />
         ) : (
           <ShopPage
-            products={products}
-            filteredProducts={filteredProducts}
             cart={cart}
-            addToCart={addToCart}
             updateCartItemQuantity={updateCartItemQuantity}
             removeFromCart={removeFromCart}
             clearCart={clearCart}

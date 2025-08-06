@@ -1,26 +1,15 @@
 import { useState } from "react";
-import { Product } from "../../types";
-import { CouponManagement } from "../components/coupon/CouponManagement";
 import { ProductAccordion } from "../components/product/ProductAccordion";
+import { CouponManagement } from "../components/coupon/CouponManagement";
 
 interface AdminPageProps {
-  products: Product[];
   addNotification: (
     message: string,
     type: "error" | "success" | "warning"
   ) => void;
-  addProduct: (productData: Omit<Product, "id">) => Product;
-  updateProduct: (id: string, updates: Partial<Product>) => void;
-  deleteProduct: (id: string) => void;
 }
 
-export function AdminPage({
-  products,
-  addNotification,
-  addProduct,
-  updateProduct,
-  deleteProduct,
-}: AdminPageProps) {
+export function AdminPage({ addNotification }: AdminPageProps) {
   // 내부 상태 관리
   const [activeTab, setActiveTab] = useState<"products" | "coupons">(
     "products"
@@ -58,13 +47,7 @@ export function AdminPage({
       </div>
 
       {activeTab === "products" ? (
-        <ProductAccordion
-          products={products}
-          onEditProduct={updateProduct}
-          onDeleteProduct={deleteProduct}
-          onAddNewProduct={addProduct}
-          onNotification={addNotification}
-        />
+        <ProductAccordion onNotification={addNotification} />
       ) : (
         <CouponManagement addNotification={addNotification} />
       )}

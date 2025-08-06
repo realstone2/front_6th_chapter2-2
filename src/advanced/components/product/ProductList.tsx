@@ -1,17 +1,15 @@
 import React, { useCallback } from "react";
 
-import { CartItem, Product } from "../../../types";
+import { Product } from "../../../types";
 import { getRefinedProduct } from "../../utils/productUtils";
 import { displayPrice } from "../../utils/formatters";
 import { getRemainingStock } from "../../utils/cartUtils";
 import useFilterSearchParams from "../../../hooks/useFilterSearchParams";
+import { useProducts } from "../../hooks/useProducts";
+import { useCart } from "../../hooks/useCart";
 import { ImageIcon } from "../icons";
 
 interface ProductListProps {
-  products: Product[];
-  filteredProducts: Product[];
-  cart: CartItem[];
-  addToCart: (product: Product, quantity?: number) => void;
   addNotification: (
     message: string,
     type: "error" | "success" | "warning"
@@ -19,12 +17,10 @@ interface ProductListProps {
 }
 
 export const ProductList: React.FC<ProductListProps> = ({
-  products,
-  filteredProducts,
-  cart,
-  addToCart,
   addNotification,
 }) => {
+  const { products, filteredProducts } = useProducts();
+  const { cart, addToCart } = useCart();
   const { filterSearchParams } = useFilterSearchParams();
 
   const handleAddToCart = useCallback(

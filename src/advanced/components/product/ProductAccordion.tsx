@@ -2,12 +2,9 @@ import React, { useState, useCallback } from "react";
 import { Product } from "../../../types";
 import { displayPrice } from "../../utils/formatters";
 import { ProductForm } from "./ProductForm";
+import { useProducts } from "../../hooks/useProducts";
 
 interface ProductAccordionProps {
-  products: Product[];
-  onEditProduct: (id: string, updates: Partial<Product>) => void;
-  onDeleteProduct: (productId: string) => void;
-  onAddNewProduct: (productData: Omit<Product, "id">) => Product;
   onNotification: (
     message: string,
     type: "error" | "success" | "warning"
@@ -15,12 +12,10 @@ interface ProductAccordionProps {
 }
 
 export const ProductAccordion: React.FC<ProductAccordionProps> = ({
-  products,
-  onEditProduct,
-  onDeleteProduct,
-  onAddNewProduct,
   onNotification,
 }) => {
+  const { products, addProduct, updateProduct, deleteProduct } = useProducts();
+
   const [showProductForm, setShowProductForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState<string | null>(null);
   const [selectedProduct, setSelectedProduct] = useState<Product | undefined>(
@@ -52,24 +47,24 @@ export const ProductAccordion: React.FC<ProductAccordionProps> = ({
   const handleProductSubmit = useCallback(
     (productData: Omit<Product, "id">) => {
       if (editingProduct && editingProduct !== "new") {
-        onEditProduct(editingProduct, productData);
+        updateProduct(editingProduct, productData);
       } else {
-        onAddNewProduct(productData);
+        addProduct(productData);
       }
       setEditingProduct(null);
       setSelectedProduct(undefined);
       setShowProductForm(false);
     },
-    [editingProduct, onEditProduct, onAddNewProduct]
+    [editingProduct, updateProduct, addProduct]
   );
 
   // 상품 삭제
   const handleDeleteProduct = useCallback(
     (productId: string) => {
-      onDeleteProduct(productId);
+      deleteProduct(productId);
       onNotification("상품이 삭제되었습니다.", "success");
     },
-    [onDeleteProduct, onNotification]
+    [deleteProduct, onNotification]
   );
 
   return (

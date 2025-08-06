@@ -8,11 +8,7 @@ import { CouponSection } from "../components/coupon/CouponSection";
 import { PaymentSection } from "../components/payment/PaymentSection";
 
 interface ShopPageProps {
-  products: Product[];
-  filteredProducts: Product[];
-
   cart: CartItem[];
-  addToCart: (product: Product, quantity?: number) => void;
   updateCartItemQuantity: (productId: string, quantity: number) => void;
   removeFromCart: (productId: string) => void;
   clearCart: () => void;
@@ -25,10 +21,7 @@ interface ShopPageProps {
 }
 
 export function ShopPage({
-  products,
-  filteredProducts,
   cart,
-  addToCart,
   updateCartItemQuantity,
   removeFromCart,
   clearCart,
@@ -98,13 +91,7 @@ export function ShopPage({
     <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
       <div className="lg:col-span-3">
         {/* 상품 목록 */}
-        <ProductList
-          products={products}
-          filteredProducts={filteredProducts}
-          cart={cart}
-          addToCart={addToCart}
-          addNotification={addNotification}
-        />
+        <ProductList addNotification={addNotification} />
       </div>
 
       <div className="lg:col-span-1">

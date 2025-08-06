@@ -1,33 +1,11 @@
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import { Coupon } from "../../types";
-import { initialCoupons } from "../constants/coupon";
-import { isCouponDuplicate, generateCouponCode } from "../utils/couponUtils";
+import { useAtom } from "jotai";
+import { couponsAtom } from "../models/coupon";
+import { generateCouponCode } from "../utils/couponUtils";
 
 export const useCoupons = () => {
-  const [coupons, _setCoupons] = useState<Coupon[]>(() => {
-    const saved = localStorage.getItem("coupons");
-    if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch {
-        return initialCoupons;
-      }
-    }
-    return initialCoupons;
-  });
-
-  const setCoupons: React.Dispatch<React.SetStateAction<Coupon[]>> =
-    useCallback(
-      (coupons) => {
-        _setCoupons((prev) => {
-          const newValue =
-            typeof coupons === "function" ? coupons(prev) : coupons;
-          localStorage.setItem("coupons", JSON.stringify(newValue));
-          return newValue;
-        });
-      },
-      [_setCoupons]
-    );
+  const [coupons, setCoupons] = useAtom<Coupon[]>(couponsAtom);
 
   // 쿠폰 추가
   const addCoupon = useCallback(
@@ -80,7 +58,6 @@ export const useCoupons = () => {
     coupons,
     addCoupon,
     removeCoupon,
-
     getCouponByCode,
     isCouponExists,
     getAllCoupons,

@@ -1,72 +1,60 @@
-import { useCallback, useState, useEffect } from "react";
-
+import { useCallback } from "react";
 import { Product } from "../../types";
+import { useAtom } from "jotai";
+import { productsAtom } from "../models/product";
 import { generateProductId, validateProductData } from "../utils/productUtils";
-import { initialProducts } from "../constants/product";
 import useFilterSearchParams from "../../hooks/useFilterSearchParams";
 
 export const useProducts = () => {
-  const [products, _setProducts] = useState<Product[]>(() => {
-    const saved = localStorage.getItem("products");
-    if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch {
-        return initialProducts;
-      }
-    }
-    return initialProducts;
-  });
-
-  const setProducts: React.Dispatch<React.SetStateAction<Product[]>> =
-    useCallback(
-      (products) => {
-        _setProducts((prev) => {
-          const newValue =
-            typeof products === "function" ? products(prev) : products;
-          localStorage.setItem("products", JSON.stringify(newValue));
-          return newValue;
-        });
-      },
-      [_setProducts]
-    );
-
+  const [products, setProducts] = useAtom<Product[]>(productsAtom);
   const { filterSearchParams } = useFilterSearchParams();
 
   // 상품 추가
-  const addProduct = useCallback((productData: Omit<Product, "id">) => {
-    if (!validateProductData(productData)) {
-      throw new Error("Invalid product data");
-    }
+  const addProduct = useCallback(
+    (productData: Omit<Product, "id">) => {
+      if (!validateProductData(productData)) {
+        throw new Error("Invalid product data");
+      }
 
-    const newProduct: Product = {
-      ...productData,
-      id: generateProductId(),
-    };
+      const newProduct: Product = {
+        ...productData,
+        id: generateProductId(),
+      };
 
-    setProducts((prev: Product[]) => [...prev, newProduct]);
-    return newProduct;
-  }, []);
+      setProducts((prev: Product[]) => [...prev, newProduct]);
+      return newProduct;
+    },
+    [setProducts]
+  );
 
   // 상품 수정
-  const updateProduct = useCallback((id: string, updates: Partial<Product>) => {
-    setProducts((prev: Product[]) =>
-      prev.map((product: Product) =>
-        product.id === id ? { ...product, ...updates } : product
-      )
-    );
-  }, []);
+  const updateProduct = useCallback(
+    (id: string, updates: Partial<Product>) => {
+      setProducts((prev: Product[]) =>
+        prev.map((product: Product) =>
+          product.id === id ? { ...product, ...updates } : product
+        )
+      );
+    },
+    [setProducts]
+  );
 
-  const deleteProduct = useCallback((productId: string) => {
-    setProducts((prev) => prev.filter((p) => p.id !== productId));
-  }, []);
+  const deleteProduct = useCallback(
+    (productId: string) => {
+      setProducts((prev) => prev.filter((p) => p.id !== productId));
+    },
+    [setProducts]
+  );
 
   // 상품 삭제
-  const removeProduct = useCallback((id: string) => {
-    setProducts((prev: Product[]) =>
-      prev.filter((product: Product) => product.id !== id)
-    );
-  }, []);
+  const removeProduct = useCallback(
+    (id: string) => {
+      setProducts((prev: Product[]) =>
+        prev.filter((product: Product) => product.id !== id)
+      );
+    },
+    [setProducts]
+  );
 
   const filteredProducts = filterSearchParams.searchTerm
     ? products.filter(

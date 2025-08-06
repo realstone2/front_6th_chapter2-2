@@ -1,11 +1,10 @@
 import { useState } from "react";
-import { Coupon, Product } from "../../types";
+import { Product } from "../../types";
 import { CouponManagement } from "../components/coupon/CouponManagement";
 import { ProductAccordion } from "../components/product/ProductAccordion";
 
 interface AdminPageProps {
   products: Product[];
-  coupons: Coupon[];
   addNotification: (
     message: string,
     type: "error" | "success" | "warning"
@@ -13,19 +12,14 @@ interface AdminPageProps {
   addProduct: (productData: Omit<Product, "id">) => Product;
   updateProduct: (id: string, updates: Partial<Product>) => void;
   deleteProduct: (id: string) => void;
-  addCoupon: (coupon: Coupon) => void;
-  removeCoupon: (couponCode: string) => void;
 }
 
 export function AdminPage({
   products,
-  coupons,
   addNotification,
   addProduct,
   updateProduct,
   deleteProduct,
-  addCoupon,
-  removeCoupon,
 }: AdminPageProps) {
   // 내부 상태 관리
   const [activeTab, setActiveTab] = useState<"products" | "coupons">(
@@ -72,12 +66,7 @@ export function AdminPage({
           onNotification={addNotification}
         />
       ) : (
-        <CouponManagement
-          coupons={coupons}
-          onAddCoupon={addCoupon}
-          onRemoveCoupon={removeCoupon}
-          addNotification={addNotification}
-        />
+        <CouponManagement addNotification={addNotification} />
       )}
     </div>
   );

@@ -1,16 +1,17 @@
 import { Coupon } from "../../../types";
+import { useCoupons } from "../../hooks/useCoupons";
 
 export function CouponSection({
-  coupons,
   selectedCoupon,
   setSelectedCoupon,
   applyCoupon,
 }: {
-  coupons: Coupon[];
   selectedCoupon: Coupon | null;
   setSelectedCoupon: (coupon: Coupon | null) => void;
   applyCoupon: (coupon: Coupon) => void;
 }) {
+  const { coupons } = useCoupons();
+
   return (
     <section className="bg-white rounded-lg border border-gray-200 p-4">
       <div className="flex items-center justify-between mb-3">

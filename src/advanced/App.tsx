@@ -7,7 +7,6 @@ import { ShopPage } from "./pages/ShopPage";
 import { Header } from "./components/ui/Header";
 import { NotificationList } from "./components/ui/NotificationList";
 import { useCart } from "./hooks/useCart";
-import { useCoupons } from "./hooks/useCoupons";
 import { useProducts } from "./hooks/useProducts";
 
 export interface Notification {
@@ -24,8 +23,6 @@ const App = () => {
     updateProduct,
     deleteProduct,
   } = useProducts();
-
-  const { coupons, addCoupon, removeCoupon } = useCoupons();
 
   const [selectedCoupon, setSelectedCoupon] = useState<Coupon | null>(null);
 
@@ -59,13 +56,10 @@ const App = () => {
         {isAdmin ? (
           <AdminPage
             products={products}
-            coupons={coupons}
             addNotification={addNotification}
             addProduct={addProduct}
             updateProduct={updateProduct}
             deleteProduct={deleteProduct}
-            addCoupon={addCoupon}
-            removeCoupon={removeCoupon}
           />
         ) : (
           <ShopPage
@@ -79,7 +73,6 @@ const App = () => {
             selectedCoupon={selectedCoupon}
             setSelectedCoupon={setSelectedCoupon}
             addNotification={addNotification}
-            coupons={coupons}
           />
         )}
       </main>

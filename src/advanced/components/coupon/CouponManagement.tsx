@@ -7,11 +7,9 @@ import {
   isCouponDuplicate,
 } from "../../utils/couponUtils";
 import { TrashIcon, PlusIcon } from "../icons";
+import { useCoupons } from "../../hooks/useCoupons";
 
 interface CouponManagementProps {
-  coupons: Coupon[];
-  onAddCoupon: (coupon: Coupon) => void;
-  onRemoveCoupon: (couponCode: string) => void;
   addNotification: (
     message: string,
     type: "error" | "success" | "warning"
@@ -19,11 +17,9 @@ interface CouponManagementProps {
 }
 
 export const CouponManagement: React.FC<CouponManagementProps> = ({
-  coupons,
-  onAddCoupon,
-  onRemoveCoupon,
   addNotification,
 }) => {
+  const { coupons, addCoupon, removeCoupon } = useCoupons();
   const [showCouponForm, setShowCouponForm] = useState(false);
 
   const handleAddCoupon = (coupon: Coupon) => {
@@ -39,13 +35,13 @@ export const CouponManagement: React.FC<CouponManagementProps> = ({
     }
 
     // 검증 통과 후 쿠폰 추가
-    onAddCoupon(coupon);
+    addCoupon(coupon);
     addNotification("쿠폰이 추가되었습니다.", "success");
     setShowCouponForm(false);
   };
 
   const handleRemoveCoupon = (couponCode: string) => {
-    onRemoveCoupon(couponCode);
+    removeCoupon(couponCode);
     addNotification("쿠폰이 삭제되었습니다.", "success");
   };
 

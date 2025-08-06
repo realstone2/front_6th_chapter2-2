@@ -22,7 +22,6 @@ interface ShopPageProps {
     message: string,
     type: "error" | "success" | "warning"
   ) => void;
-  coupons: Coupon[];
 }
 
 export function ShopPage({
@@ -36,7 +35,6 @@ export function ShopPage({
   selectedCoupon,
   setSelectedCoupon,
   addNotification,
-  coupons,
 }: ShopPageProps) {
   // 장바구니 상품 수량 변경 (props로 받은 함수 사용)
   const handleUpdateQuantity = useCallback(
@@ -120,7 +118,6 @@ export function ShopPage({
           {cart.length > 0 && (
             <>
               <CouponSection
-                coupons={coupons}
                 selectedCoupon={selectedCoupon}
                 setSelectedCoupon={setSelectedCoupon}
                 applyCoupon={applyCoupon}

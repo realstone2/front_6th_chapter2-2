@@ -1,18 +1,17 @@
-import { CartItem } from "../../../types";
 import useFilterSearchParams from "../../../hooks/useFilterSearchParams";
 import { useDebouncedCallback } from "../../utils/hooks/useDebounce";
 import { getCartItemCount } from "../../utils/cartUtils";
 import { CartIcon } from "../icons";
+import { useCart } from "../../hooks/useCart";
 
 export const Header = ({
   isAdmin,
   setIsAdmin,
-  cart,
 }: {
   isAdmin: boolean;
   setIsAdmin: (isAdmin: boolean) => void;
-  cart: CartItem[];
 }) => {
+  const { cart } = useCart();
   const { filterSearchParams, setFilterSearchParams } = useFilterSearchParams();
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {

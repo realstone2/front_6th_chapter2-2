@@ -1,16 +1,15 @@
-import { CartItem, Product } from "../../../types";
+import { Product } from "../../../types";
 import { CartIcon, TrashIcon } from "../icons";
 import { calculateItemTotal } from "../../utils/cartUtils";
+import { useCart } from "../../hooks/useCart";
 
 export function CartSection({
-  cart,
-  removeFromCart,
   handleUpdateQuantity,
 }: {
-  cart: CartItem[];
-  removeFromCart: (productId: string) => void;
   handleUpdateQuantity: (product: Product, newQuantity: number) => void;
 }) {
+  const { cart, removeFromCart } = useCart();
+
   return (
     <section className="bg-white rounded-lg border border-gray-200 p-4">
       <h2 className="text-lg font-semibold mb-4 flex items-center">

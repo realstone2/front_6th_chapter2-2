@@ -1,17 +1,14 @@
 import { useCallback } from "react";
-import { CartItem, Coupon, Product } from "../../types";
+import { Coupon, Product } from "../../types";
 
 import { ProductList } from "../components/product/ProductList";
 import { calculateCartTotal, getRemainingStock } from "../utils/cartUtils";
 import { CartSection } from "../components/cart/CartSection";
 import { CouponSection } from "../components/coupon/CouponSection";
 import { PaymentSection } from "../components/payment/PaymentSection";
+import { useCart } from "../hooks/useCart";
 
 interface ShopPageProps {
-  cart: CartItem[];
-  updateCartItemQuantity: (productId: string, quantity: number) => void;
-  removeFromCart: (productId: string) => void;
-  clearCart: () => void;
   selectedCoupon: Coupon | null;
   setSelectedCoupon: (coupon: Coupon | null) => void;
   addNotification: (
@@ -21,14 +18,12 @@ interface ShopPageProps {
 }
 
 export function ShopPage({
-  cart,
-  updateCartItemQuantity,
-  removeFromCart,
-  clearCart,
   selectedCoupon,
   setSelectedCoupon,
   addNotification,
 }: ShopPageProps) {
+  const { cart, updateCartItemQuantity, removeFromCart } = useCart();
+
   // 장바구니 상품 수량 변경 (props로 받은 함수 사용)
   const handleUpdateQuantity = useCallback(
     (product: Product, newQuantity: number) => {
@@ -74,19 +69,6 @@ export function ShopPage({
     [addNotification, cart, selectedCoupon, setSelectedCoupon]
   );
 
-  // 주문 완료
-  const completeOrder = useCallback(() => {
-    const orderNumber = `ORD-${Date.now()}`;
-    addNotification(
-      `주문이 완료되었습니다. 주문번호: ${orderNumber}`,
-      "success"
-    );
-    clearCart();
-    setSelectedCoupon(null);
-  }, [addNotification, clearCart, setSelectedCoupon]);
-
-  const totals = calculateCartTotal(cart, selectedCoupon);
-
   return (
     <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
       <div className="lg:col-span-3">
@@ -96,11 +78,7 @@ export function ShopPage({
 
       <div className="lg:col-span-1">
         <div className="sticky top-24 space-y-4">
-          <CartSection
-            cart={cart}
-            removeFromCart={removeFromCart}
-            handleUpdateQuantity={handleUpdateQuantity}
-          />
+          <CartSection handleUpdateQuantity={handleUpdateQuantity} />
 
           {cart.length > 0 && (
             <>
@@ -110,7 +88,11 @@ export function ShopPage({
                 applyCoupon={applyCoupon}
               />
 
-              <PaymentSection totals={totals} completeOrder={completeOrder} />
+              <PaymentSection
+                selectedCoupon={selectedCoupon}
+                setSelectedCoupon={setSelectedCoupon}
+                addNotification={addNotification}
+              />
             </>
           )}
         </div>

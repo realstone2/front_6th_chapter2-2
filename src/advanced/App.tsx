@@ -6,7 +6,6 @@ import { ShopPage } from "./pages/ShopPage";
 
 import { Header } from "./components/ui/Header";
 import { NotificationList } from "./components/ui/NotificationList";
-import { useCart } from "./hooks/useCart";
 
 export interface Notification {
   id: string;
@@ -32,25 +31,19 @@ const App = () => {
     []
   );
 
-  const { cart, updateCartItemQuantity, removeFromCart, clearCart } = useCart();
-
   return (
     <div className="min-h-screen bg-gray-50">
       <NotificationList
         notifications={notifications}
         setNotifications={setNotifications}
       />
-      <Header isAdmin={isAdmin} setIsAdmin={setIsAdmin} cart={cart} />
+      <Header isAdmin={isAdmin} setIsAdmin={setIsAdmin} />
 
       <main className="max-w-7xl mx-auto px-4 py-8">
         {isAdmin ? (
           <AdminPage addNotification={addNotification} />
         ) : (
           <ShopPage
-            cart={cart}
-            updateCartItemQuantity={updateCartItemQuantity}
-            removeFromCart={removeFromCart}
-            clearCart={clearCart}
             selectedCoupon={selectedCoupon}
             setSelectedCoupon={setSelectedCoupon}
             addNotification={addNotification}

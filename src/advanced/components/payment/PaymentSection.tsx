@@ -1,12 +1,33 @@
-import { CartTotal } from "../../utils/cartUtils";
+import { calculateCartTotal } from "../../utils/cartUtils";
+import { useCart } from "../../hooks/useCart";
+import { Coupon } from "../../../types";
 
 export function PaymentSection({
-  totals,
-  completeOrder,
+  selectedCoupon,
+  setSelectedCoupon,
+  addNotification,
 }: {
-  totals: CartTotal;
-  completeOrder: () => void;
+  selectedCoupon: Coupon | null;
+  setSelectedCoupon: (coupon: Coupon | null) => void;
+  addNotification: (
+    message: string,
+    type: "error" | "success" | "warning"
+  ) => void;
 }) {
+  const { cart, clearCart } = useCart();
+
+  const totals = calculateCartTotal(cart, selectedCoupon);
+
+  const completeOrder = () => {
+    const orderNumber = `ORD-${Date.now()}`;
+    addNotification(
+      `주문이 완료되었습니다. 주문번호: ${orderNumber}`,
+      "success"
+    );
+    clearCart();
+    setSelectedCoupon(null);
+  };
+
   return (
     <section className="bg-white rounded-lg border border-gray-200 p-4">
       <h3 className="text-lg font-semibold mb-4">결제 정보</h3>

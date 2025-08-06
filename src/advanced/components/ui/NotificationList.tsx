@@ -1,13 +1,9 @@
-import { Notification } from "../../App";
+import { useNotifications } from "../../hooks/useNotifications";
 import { CloseIcon } from "../icons";
 
-export const NotificationList = ({
-  notifications,
-  setNotifications,
-}: {
-  notifications: Notification[];
-  setNotifications: React.Dispatch<React.SetStateAction<Notification[]>>;
-}) => {
+export const NotificationList = () => {
+  const { notifications, removeNotification } = useNotifications();
+
   return (
     <div className="fixed top-20 right-4 z-50 space-y-2 max-w-sm">
       {notifications.map((notif) => (
@@ -23,9 +19,7 @@ export const NotificationList = ({
         >
           <span className="mr-2">{notif.message}</span>
           <button
-            onClick={() =>
-              setNotifications((prev) => prev.filter((n) => n.id !== notif.id))
-            }
+            onClick={() => removeNotification(notif.id)}
             className="text-white hover:text-gray-200"
           >
             <CloseIcon className="w-4 h-4" />

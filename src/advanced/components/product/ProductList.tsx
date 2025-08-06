@@ -7,20 +7,13 @@ import { getRemainingStock } from "../../utils/cartUtils";
 import useFilterSearchParams from "../../../hooks/useFilterSearchParams";
 import { useProducts } from "../../hooks/useProducts";
 import { useCart } from "../../hooks/useCart";
+import { useNotifications } from "../../hooks/useNotifications";
 import { ImageIcon } from "../icons";
 
-interface ProductListProps {
-  addNotification: (
-    message: string,
-    type: "error" | "success" | "warning"
-  ) => void;
-}
-
-export const ProductList: React.FC<ProductListProps> = ({
-  addNotification,
-}) => {
+export const ProductList: React.FC = () => {
   const { products, filteredProducts } = useProducts();
   const { cart, addToCart } = useCart();
+  const { addNotification } = useNotifications();
   const { filterSearchParams } = useFilterSearchParams();
 
   const handleAddToCart = useCallback(

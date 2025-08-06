@@ -1,5 +1,4 @@
-import { useCallback, useState } from "react";
-import { Coupon } from "../types";
+import { useState } from "react";
 
 import { AdminPage } from "./pages/AdminPage";
 import { ShopPage } from "./pages/ShopPage";
@@ -16,33 +15,13 @@ export interface Notification {
 const App = () => {
   const [isAdmin, setIsAdmin] = useState(false);
 
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const addNotification = useCallback(
-    (message: string, type: "error" | "success" | "warning" = "success") => {
-      const id = Date.now().toString();
-      setNotifications((prev) => [...prev, { id, message, type }]);
-
-      setTimeout(() => {
-        setNotifications((prev) => prev.filter((n) => n.id !== id));
-      }, 3000);
-    },
-    []
-  );
-
   return (
     <div className="min-h-screen bg-gray-50">
-      <NotificationList
-        notifications={notifications}
-        setNotifications={setNotifications}
-      />
+      <NotificationList />
       <Header isAdmin={isAdmin} setIsAdmin={setIsAdmin} />
 
       <main className="max-w-7xl mx-auto px-4 py-8">
-        {isAdmin ? (
-          <AdminPage addNotification={addNotification} />
-        ) : (
-          <ShopPage addNotification={addNotification} />
-        )}
+        {isAdmin ? <AdminPage /> : <ShopPage />}
       </main>
     </div>
   );

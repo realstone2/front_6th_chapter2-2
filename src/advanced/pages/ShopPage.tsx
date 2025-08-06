@@ -7,18 +7,13 @@ import { CartSection } from "../components/cart/CartSection";
 import { CouponSection } from "../components/coupon/CouponSection";
 import { PaymentSection } from "../components/payment/PaymentSection";
 import { useCart } from "../hooks/useCart";
+import { useNotifications } from "../hooks/useNotifications";
 
-interface ShopPageProps {
-  addNotification: (
-    message: string,
-    type: "error" | "success" | "warning"
-  ) => void;
-}
-
-export function ShopPage({ addNotification }: ShopPageProps) {
+export function ShopPage() {
   const [selectedCoupon, setSelectedCoupon] = useState<Coupon | null>(null);
 
   const { cart, updateCartItemQuantity, removeFromCart } = useCart();
+  const { addNotification } = useNotifications();
 
   // 장바구니 상품 수량 변경 (props로 받은 함수 사용)
   const handleUpdateQuantity = useCallback(
@@ -69,7 +64,7 @@ export function ShopPage({ addNotification }: ShopPageProps) {
     <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
       <div className="lg:col-span-3">
         {/* 상품 목록 */}
-        <ProductList addNotification={addNotification} />
+        <ProductList />
       </div>
 
       <div className="lg:col-span-1">
@@ -87,7 +82,6 @@ export function ShopPage({ addNotification }: ShopPageProps) {
               <PaymentSection
                 selectedCoupon={selectedCoupon}
                 setSelectedCoupon={setSelectedCoupon}
-                addNotification={addNotification}
               />
             </>
           )}

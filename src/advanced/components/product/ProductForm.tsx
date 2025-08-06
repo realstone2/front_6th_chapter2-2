@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Product } from "../../../types";
 import { CloseIcon } from "../icons";
+import { useNotifications } from "../../hooks/useNotifications";
 
 interface ProductFormData {
   name: string;
@@ -15,10 +16,6 @@ interface ProductFormProps {
   product?: Product;
   onSubmit: (productData: Omit<Product, "id">) => void;
   onCancel: () => void;
-  onNotification: (
-    message: string,
-    type: "error" | "success" | "warning"
-  ) => void;
 }
 
 export const ProductForm: React.FC<ProductFormProps> = ({
@@ -26,8 +23,8 @@ export const ProductForm: React.FC<ProductFormProps> = ({
   product,
   onSubmit,
   onCancel,
-  onNotification,
 }) => {
+  const { addNotification } = useNotifications();
   const [productForm, setProductForm] = useState<ProductFormData>({
     name: "",
     price: 0,
@@ -67,7 +64,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
       ...productForm,
       discounts: productForm.discounts,
     });
-    onNotification(
+    addNotification(
       editingProduct === "new"
         ? "상품이 추가되었습니다."
         : "상품이 수정되었습니다.",
@@ -134,7 +131,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                 if (value === "") {
                   updateForm({ price: 0 });
                 } else if (parseInt(value) < 0) {
-                  onNotification("가격은 0보다 커야 합니다", "error");
+                  addNotification("가격은 0보다 커야 합니다", "error");
                   updateForm({ price: 0 });
                 }
               }}
@@ -161,10 +158,13 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                 if (value === "") {
                   updateForm({ stock: 0 });
                 } else if (parseInt(value) < 0) {
-                  onNotification("재고는 0보다 커야 합니다", "error");
+                  addNotification("재고는 0보다 커야 합니다", "error");
                   updateForm({ stock: 0 });
                 } else if (parseInt(value) > 9999) {
-                  onNotification("재고는 9999개를 초과할 수 없습니다", "error");
+                  addNotification(
+                    "재고는 9999개를 초과할 수 없습니다",
+                    "error"
+                  );
                   updateForm({ stock: 9999 });
                 }
               }}

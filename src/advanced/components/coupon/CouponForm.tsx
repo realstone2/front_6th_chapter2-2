@@ -4,21 +4,18 @@ import {
   COUPON_FORM_INITIAL_STATE,
   COUPON_LIMITS,
 } from "../../constants/coupon";
+import { useNotifications } from "../../hooks/useNotifications";
 
 interface CouponFormProps {
   onSubmit: (coupon: Coupon) => void;
   onCancel: () => void;
-  addNotification: (
-    message: string,
-    type: "error" | "success" | "warning"
-  ) => void;
 }
 
 export const CouponForm: React.FC<CouponFormProps> = ({
   onSubmit,
   onCancel,
-  addNotification,
 }) => {
+  const { addNotification } = useNotifications();
   const [formData, setFormData] = useState(COUPON_FORM_INITIAL_STATE);
 
   const handleSubmit = (e: React.FormEvent) => {

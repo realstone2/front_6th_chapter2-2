@@ -1,20 +1,17 @@
 import { calculateCartTotal } from "../../utils/cartUtils";
 import { useCart } from "../../hooks/useCart";
+import { useNotifications } from "../../hooks/useNotifications";
 import { Coupon } from "../../../types";
 
 export function PaymentSection({
   selectedCoupon,
   setSelectedCoupon,
-  addNotification,
 }: {
   selectedCoupon: Coupon | null;
   setSelectedCoupon: (coupon: Coupon | null) => void;
-  addNotification: (
-    message: string,
-    type: "error" | "success" | "warning"
-  ) => void;
 }) {
   const { cart, clearCart } = useCart();
+  const { addNotification } = useNotifications();
 
   const totals = calculateCartTotal(cart, selectedCoupon);
 

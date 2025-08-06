@@ -8,18 +8,11 @@ import {
 } from "../../utils/couponUtils";
 import { TrashIcon, PlusIcon } from "../icons";
 import { useCoupons } from "../../hooks/useCoupons";
+import { useNotifications } from "../../hooks/useNotifications";
 
-interface CouponManagementProps {
-  addNotification: (
-    message: string,
-    type: "error" | "success" | "warning"
-  ) => void;
-}
-
-export const CouponManagement: React.FC<CouponManagementProps> = ({
-  addNotification,
-}) => {
+export const CouponManagement: React.FC = () => {
   const { coupons, addCoupon, removeCoupon } = useCoupons();
+  const { addNotification } = useNotifications();
   const [showCouponForm, setShowCouponForm] = useState(false);
 
   const handleAddCoupon = (coupon: Coupon) => {
@@ -100,7 +93,6 @@ export const CouponManagement: React.FC<CouponManagementProps> = ({
             <CouponForm
               onSubmit={handleAddCoupon}
               onCancel={handleCancelForm}
-              addNotification={addNotification}
             />
           </div>
         )}

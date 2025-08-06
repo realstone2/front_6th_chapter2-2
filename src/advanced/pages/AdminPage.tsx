@@ -2,14 +2,7 @@ import { useState } from "react";
 import { ProductAccordion } from "../components/product/ProductAccordion";
 import { CouponManagement } from "../components/coupon/CouponManagement";
 
-interface AdminPageProps {
-  addNotification: (
-    message: string,
-    type: "error" | "success" | "warning"
-  ) => void;
-}
-
-export function AdminPage({ addNotification }: AdminPageProps) {
+export function AdminPage() {
   // 내부 상태 관리
   const [activeTab, setActiveTab] = useState<"products" | "coupons">(
     "products"
@@ -46,11 +39,7 @@ export function AdminPage({ addNotification }: AdminPageProps) {
         </nav>
       </div>
 
-      {activeTab === "products" ? (
-        <ProductAccordion onNotification={addNotification} />
-      ) : (
-        <CouponManagement addNotification={addNotification} />
-      )}
+      {activeTab === "products" ? <ProductAccordion /> : <CouponManagement />}
     </div>
   );
 }

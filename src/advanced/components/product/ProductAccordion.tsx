@@ -3,18 +3,11 @@ import { Product } from "../../../types";
 import { displayPrice } from "../../utils/formatters";
 import { ProductForm } from "./ProductForm";
 import { useProducts } from "../../hooks/useProducts";
+import { useNotifications } from "../../hooks/useNotifications";
 
-interface ProductAccordionProps {
-  onNotification: (
-    message: string,
-    type: "error" | "success" | "warning"
-  ) => void;
-}
-
-export const ProductAccordion: React.FC<ProductAccordionProps> = ({
-  onNotification,
-}) => {
+export const ProductAccordion: React.FC = () => {
   const { products, addProduct, updateProduct, deleteProduct } = useProducts();
+  const { addNotification } = useNotifications();
 
   const [showProductForm, setShowProductForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState<string | null>(null);
@@ -62,9 +55,9 @@ export const ProductAccordion: React.FC<ProductAccordionProps> = ({
   const handleDeleteProduct = useCallback(
     (productId: string) => {
       deleteProduct(productId);
-      onNotification("상품이 삭제되었습니다.", "success");
+      addNotification("상품이 삭제되었습니다.", "success");
     },
-    [deleteProduct, onNotification]
+    [deleteProduct, addNotification]
   );
 
   return (
@@ -156,7 +149,6 @@ export const ProductAccordion: React.FC<ProductAccordionProps> = ({
           product={selectedProduct}
           onSubmit={handleProductSubmit}
           onCancel={handleCancelProductForm}
-          onNotification={onNotification}
         />
       )}
     </>

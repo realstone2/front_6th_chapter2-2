@@ -1,20 +1,20 @@
-import React from "react";
-import { Discount } from "../../types";
+import React, { useState, useEffect } from "react";
+import { Product } from "../../../types";
+import { CloseIcon } from "../icons";
 
 interface ProductFormData {
   name: string;
   price: number;
   stock: number;
   description: string;
-  discounts: Discount[];
+  discounts: Array<{ quantity: number; rate: number }>;
 }
 
 interface ProductFormProps {
-  productForm: ProductFormData;
   editingProduct: string | null;
-  onSubmit: (e: React.FormEvent) => void;
+  product?: Product;
+  onSubmit: (productData: Omit<Product, "id">) => void;
   onCancel: () => void;
-  onFormChange: (form: ProductFormData) => void;
   onNotification: (
     message: string,
     type: "error" | "success" | "warning"
@@ -22,20 +22,73 @@ interface ProductFormProps {
 }
 
 export const ProductForm: React.FC<ProductFormProps> = ({
-  productForm,
   editingProduct,
+  product,
   onSubmit,
   onCancel,
-  onFormChange,
   onNotification,
 }) => {
+  const [productForm, setProductForm] = useState<ProductFormData>({
+    name: "",
+    price: 0,
+    stock: 0,
+    description: "",
+    discounts: [],
+  });
+
+  // 상품 데이터가 변경될 때 폼 초기화
+  useEffect(() => {
+    if (product && editingProduct === product.id) {
+      setProductForm({
+        name: product.name,
+        price: product.price,
+        stock: product.stock,
+        description: product.description || "",
+        discounts: product.discounts || [],
+      });
+    } else if (editingProduct === "new") {
+      setProductForm({
+        name: "",
+        price: 0,
+        stock: 0,
+        description: "",
+        discounts: [],
+      });
+    }
+  }, [editingProduct, product]);
+
   const updateForm = (updates: Partial<ProductFormData>) => {
-    onFormChange({ ...productForm, ...updates });
+    setProductForm({ ...productForm, ...updates });
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSubmit({
+      ...productForm,
+      discounts: productForm.discounts,
+    });
+    onNotification(
+      editingProduct === "new"
+        ? "상품이 추가되었습니다."
+        : "상품이 수정되었습니다.",
+      "success"
+    );
+  };
+
+  const handleCancel = () => {
+    setProductForm({
+      name: "",
+      price: 0,
+      stock: 0,
+      description: "",
+      discounts: [],
+    });
+    onCancel();
   };
 
   return (
     <div className="p-6 border-t border-gray-200 bg-gray-50">
-      <form onSubmit={onSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4">
         <h3 className="text-lg font-medium text-gray-900">
           {editingProduct === "new" ? "새 상품 추가" : "상품 수정"}
         </h3>
@@ -170,19 +223,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                   }}
                   className="text-red-600 hover:text-red-800"
                 >
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
+                  <CloseIcon className="w-4 h-4" />
                 </button>
               </div>
             ))}
@@ -206,7 +247,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
         <div className="flex justify-end gap-3">
           <button
             type="button"
-            onClick={onCancel}
+            onClick={handleCancel}
             className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
           >
             취소

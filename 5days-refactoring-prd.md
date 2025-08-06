@@ -12,34 +12,34 @@
 ### 1단계: 레이아웃 컴포넌트 분리
 
 ```typescript
-// src/advanced/components/layout/Header.tsx
+// src/basic/components/layout/Header.tsx
 export const Header: React.FC<{
   isAdmin: boolean;
   onToggleAdmin: () => void;
   cartItemCount: number;
 }>;
 
-// src/advanced/components/layout/Navigation.tsx
+// src/basic/components/layout/Navigation.tsx
 export const Navigation: React.FC<NavigationProps>;
 
-// src/advanced/components/layout/MainLayout.tsx
+// src/basic/components/layout/MainLayout.tsx
 export const MainLayout: React.FC<MainLayoutProps>;
 ```
 
 ### 2단계: 페이지 컴포넌트 최종 정리
 
 ```typescript
-// src/advanced/components/ProductListPage.tsx
+// src/basic/components/ProductListPage.tsx
 export const ProductListPage: React.FC - 완전한 상품 목록 페이지
 
-// src/advanced/components/AdminPage.tsx
+// src/basic/components/AdminPage.tsx
 export const AdminPage: React.FC - 완전한 관리자 페이지
 ```
 
 ### 3단계: App 컴포넌트 최종 정리
 
 ```typescript
-// src/advanced/App.tsx - 최종 모습 (50줄 이하)
+// src/basic/App.tsx - 최종 모습 (50줄 이하)
 const App = () => {
   const [isAdmin, setIsAdmin] = useState(false);
 
@@ -62,7 +62,7 @@ const App = () => {
 ### 4단계: 최종 폴더 구조 정리
 
 ```
-src/advanced/
+src/basic/
 ├── App.tsx (50줄 이하)
 ├── components/
 │   ├── layout/         - 레이아웃 컴포넌트

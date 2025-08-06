@@ -4,6 +4,7 @@ import { CartItem, Product } from "../../types";
  * 상품 검색 필터링
  */
 export const filterProducts = (
+  //TODO: 진석 리팩토링 필요
   products: Product[],
   searchTerm: string
 ): Product[] => {
@@ -41,10 +42,14 @@ export const validateProductData = (product: Partial<Product>): boolean => {
 /**
  * 남은 재고 계산
  */
-export const getRemainingStock = (
-  product: Product,
-  cart: CartItem[]
-): number => {
+const getRemainingStock = (product: Product, cart: CartItem[]): number => {
   const cartItem = cart.find((item) => item.product.id === product.id);
   return product.stock - (cartItem?.quantity || 0);
+};
+
+export const getRefinedProduct = (product: Product, cart: CartItem[]) => {
+  return {
+    ...product,
+    stock: getRemainingStock(product, cart),
+  } satisfies Product;
 };

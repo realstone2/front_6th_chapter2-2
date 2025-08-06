@@ -14,8 +14,6 @@ export interface Notification {
 }
 
 const App = () => {
-  const [selectedCoupon, setSelectedCoupon] = useState<Coupon | null>(null);
-
   const [isAdmin, setIsAdmin] = useState(false);
 
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -43,11 +41,7 @@ const App = () => {
         {isAdmin ? (
           <AdminPage addNotification={addNotification} />
         ) : (
-          <ShopPage
-            selectedCoupon={selectedCoupon}
-            setSelectedCoupon={setSelectedCoupon}
-            addNotification={addNotification}
-          />
+          <ShopPage addNotification={addNotification} />
         )}
       </main>
     </div>

@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { Coupon, Product } from "../../types";
 
 import { ProductList } from "../components/product/ProductList";
@@ -9,19 +9,15 @@ import { PaymentSection } from "../components/payment/PaymentSection";
 import { useCart } from "../hooks/useCart";
 
 interface ShopPageProps {
-  selectedCoupon: Coupon | null;
-  setSelectedCoupon: (coupon: Coupon | null) => void;
   addNotification: (
     message: string,
     type: "error" | "success" | "warning"
   ) => void;
 }
 
-export function ShopPage({
-  selectedCoupon,
-  setSelectedCoupon,
-  addNotification,
-}: ShopPageProps) {
+export function ShopPage({ addNotification }: ShopPageProps) {
+  const [selectedCoupon, setSelectedCoupon] = useState<Coupon | null>(null);
+
   const { cart, updateCartItemQuantity, removeFromCart } = useCart();
 
   // 장바구니 상품 수량 변경 (props로 받은 함수 사용)

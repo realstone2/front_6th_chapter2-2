@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Product, ProductFormData } from "../../../types";
 import { CloseIcon } from "../icons";
 import { useNotifications } from "../../hooks/useNotifications";
+import { PRODUCT_FORM_INITIAL_STATE } from "../../constants/product";
 
 interface ProductFormProps {
   initProductFormData: Product | null;
@@ -15,13 +16,9 @@ export const ProductForm: React.FC<ProductFormProps> = ({
   onCancel,
 }) => {
   const { addNotification } = useNotifications();
-  const [productForm, setProductForm] = useState<Partial<ProductFormData>>({
-    name: "",
-    description: "",
-    price: 0,
-    stock: 0,
-    discounts: [],
-  });
+  const [productForm, setProductForm] = useState<Partial<ProductFormData>>(
+    initProductFormData ?? PRODUCT_FORM_INITIAL_STATE
+  );
 
   const isNewProduct = initProductFormData?.id === "new";
 

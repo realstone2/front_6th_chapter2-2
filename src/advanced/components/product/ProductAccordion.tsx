@@ -4,51 +4,58 @@ import { displayPrice } from "../../utils/formatters";
 import { ProductForm } from "./ProductForm";
 import { useProducts } from "../../hooks/useProducts";
 import { useNotifications } from "../../hooks/useNotifications";
+import {
+  NEW_PRODUCT_FORM_KEY,
+  PRODUCT_FORM_INITIAL_STATE,
+} from "../../constants/product";
 
 export const ProductAccordion: React.FC = () => {
   const { products, addProduct, updateProduct, deleteProduct } = useProducts();
   const { addNotification } = useNotifications();
 
-  const [showProductForm, setShowProductForm] = useState(false);
-  const [editingProduct, setEditingProduct] = useState<string | null>(null);
-  const [selectedProduct, setSelectedProduct] = useState<Product | undefined>(
-    undefined
-  );
+  const [initProductFormData, setInitProductFormData] =
+    useState<Product | null>(null);
+
+  const showProductForm = initProductFormData !== null;
 
   // 상품 편집 시작
   const handleStartEditProduct = useCallback((product: Product) => {
-    setSelectedProduct(product);
-    setEditingProduct(product.id);
-    setShowProductForm(true);
+    setInitProductFormData(product);
   }, []);
 
   // 새 상품 추가 시작
   const handleAddNewProduct = useCallback(() => {
-    setSelectedProduct(undefined);
-    setEditingProduct("new");
-    setShowProductForm(true);
+    setInitProductFormData(PRODUCT_FORM_INITIAL_STATE);
   }, []);
 
   // 상품 폼 취소
   const handleCancelProductForm = useCallback(() => {
-    setEditingProduct(null);
-    setSelectedProduct(undefined);
-    setShowProductForm(false);
+    setInitProductFormData(null);
   }, []);
 
   // 상품 폼 제출 처리
   const handleProductSubmit = useCallback(
-    (productData: Omit<Product, "id">) => {
-      if (editingProduct && editingProduct !== "new") {
-        updateProduct(editingProduct, productData);
-      } else {
-        addProduct(productData);
+    (productData: Product) => {
+      addNotification(
+        initProductFormData?.id === NEW_PRODUCT_FORM_KEY
+          ? "상품이 추가되었습니다."
+          : "상품이 수정되었습니다.",
+        "success"
+      );
+      setInitProductFormData(null);
+
+      if (!initProductFormData?.id) {
+        return;
       }
-      setEditingProduct(null);
-      setSelectedProduct(undefined);
-      setShowProductForm(false);
+
+      if (initProductFormData.id === NEW_PRODUCT_FORM_KEY) {
+        addProduct(productData);
+        return;
+      }
+
+      updateProduct(initProductFormData.id, productData);
     },
-    [editingProduct, updateProduct, addProduct]
+    [addNotification, initProductFormData?.id, updateProduct, addProduct]
   );
 
   // 상품 삭제
@@ -145,8 +152,8 @@ export const ProductAccordion: React.FC = () => {
       </section>
       {showProductForm && (
         <ProductForm
-          editingProduct={editingProduct}
-          product={selectedProduct}
+          key={initProductFormData?.id ?? NEW_PRODUCT_FORM_KEY}
+          initProductFormData={initProductFormData}
           onSubmit={handleProductSubmit}
           onCancel={handleCancelProductForm}
         />

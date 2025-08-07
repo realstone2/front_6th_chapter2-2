@@ -6,7 +6,9 @@ const filterSearchParamsSchema = z.object({
   searchTerm: z.string().optional(),
 });
 
-type filterSearchParamsSchemaType = z.infer<typeof filterSearchParamsSchema>;
+export type filterSearchParamsSchemaType = z.infer<
+  typeof filterSearchParamsSchema
+>;
 
 /**
  * searchParams를 Order requestType에 맞는 타입으로 변환해서 return

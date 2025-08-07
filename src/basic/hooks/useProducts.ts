@@ -1,9 +1,9 @@
-import { useCallback, useState, useEffect } from "react";
+import { useCallback, useState } from "react";
 
-import { Product } from "../../types";
-import { generateProductId, validateProductData } from "../utils/productUtils";
-import { initialProducts } from "../constants/product";
 import useFilterSearchParams from "../../hooks/useFilterSearchParams";
+import { Product } from "../../types";
+import { initialProducts } from "../constants/product";
+import { generateProductId, validateProductData } from "../utils/productUtils";
 
 export const useProducts = () => {
   const [products, _setProducts] = useState<Product[]>(() => {

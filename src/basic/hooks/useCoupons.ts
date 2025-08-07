@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react";
 import { Coupon } from "../../types";
 import { initialCoupons } from "../constants/coupon";
-import { isCouponDuplicate, generateCouponCode } from "../utils/couponUtils";
+import { generateCouponCode } from "../utils/couponUtils";
 
 export const useCoupons = () => {
   const [coupons, _setCoupons] = useState<Coupon[]>(() => {

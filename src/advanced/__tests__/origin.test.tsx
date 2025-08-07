@@ -9,9 +9,10 @@ import {
 import { vi } from "vitest";
 import App from "../App";
 import "../../setupTests";
-import { notificationsAtom } from "../models/notificationAtom";
+
 import { useAtom } from "jotai";
 import React from "react";
+import { notificationsAtom } from "../models/notification";
 
 describe("쇼핑몰 앱 통합 테스트", () => {
   beforeEach(() => {

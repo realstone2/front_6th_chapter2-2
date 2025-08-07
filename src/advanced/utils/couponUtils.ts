@@ -18,11 +18,9 @@ export const applyCouponDiscount = (total: number, coupon: Coupon): number => {
 // 쿠폰 코드 생성
 export const generateCouponCode = (): string => {
   const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-  let result = "";
-  for (let i = 0; i < 8; i++) {
-    result += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return result;
+  return Array.from({ length: 8 }, () =>
+    chars.charAt(Math.floor(Math.random() * chars.length))
+  ).join("");
 };
 
 // 쿠폰 데이터 검증
@@ -41,7 +39,9 @@ export const validateCouponData = (coupon: Partial<Coupon>): boolean => {
       coupon.discountValue >= COUPON_VALIDATION_RULES.MIN_AMOUNT_DISCOUNT &&
       coupon.discountValue <= COUPON_VALIDATION_RULES.MAX_AMOUNT_DISCOUNT
     );
-  } else if (coupon.discountType === "percentage") {
+  }
+
+  if (coupon.discountType === "percentage") {
     return (
       coupon.discountValue >= COUPON_VALIDATION_RULES.MIN_PERCENTAGE_DISCOUNT &&
       coupon.discountValue <= COUPON_VALIDATION_RULES.MAX_PERCENTAGE_DISCOUNT
@@ -58,9 +58,12 @@ export const isCouponDuplicate = (coupons: Coupon[], code: string): boolean => {
 
 // 쿠폰 표시 텍스트 생성
 export const getCouponDisplayText = (coupon: Coupon): string => {
-  if (coupon.discountType === "amount") {
-    return `${coupon.discountValue.toLocaleString()}원 할인`;
-  } else {
-    return `${coupon.discountValue}% 할인`;
+  switch (coupon.discountType) {
+    case "amount":
+      return `${coupon.discountValue.toLocaleString()}원 할인`;
+    case "percentage":
+      return `${coupon.discountValue}% 할인`;
+    default:
+      return "";
   }
 };

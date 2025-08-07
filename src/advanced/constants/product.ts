@@ -34,10 +34,14 @@ export const initialProducts: Product[] = [
   },
 ];
 
-export const PRODUCT_FORM_INITIAL_STATE = {
+export const NEW_PRODUCT_FORM_KEY = "new";
+
+export const PRODUCT_FORM_INITIAL_STATE: Product = {
   name: "",
   price: 0,
   stock: 0,
   description: "",
   isRecommended: false,
+  discounts: [],
+  id: NEW_PRODUCT_FORM_KEY,
 };

@@ -1,15 +1,23 @@
+import { filterSearchParamsSchemaType } from "../../hooks/useFilterSearchParams";
 import { CartItem, Product } from "../../types";
 
 /**
  * 상품 검색 필터링
  */
 export const filterProducts = (
-  //TODO: 진석 리팩토링 필요
+  products: Product[],
+  filterQuery: filterSearchParamsSchemaType
+): Product[] => {
+  return filterProductsBySearchTerm(products, filterQuery.searchTerm ?? "");
+};
+
+const filterProductsBySearchTerm = (
   products: Product[],
   searchTerm: string
-): Product[] => {
-  if (!searchTerm) return products;
-
+) => {
+  if (!searchTerm.trim()) {
+    return products;
+  }
   return products.filter(
     (product) =>
       product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||

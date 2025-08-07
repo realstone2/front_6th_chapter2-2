@@ -8,6 +8,14 @@ export interface Product {
   isRecommended?: boolean;
 }
 
+export interface ProductFormData {
+  name: string;
+  price: number;
+  stock: number;
+  description: string;
+  discounts: Discount[];
+}
+
 export interface Discount {
   quantity: number;
   rate: number;

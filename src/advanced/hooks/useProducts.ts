@@ -2,7 +2,11 @@ import { useCallback } from "react";
 import { Product } from "../../types";
 import { useAtom } from "jotai";
 import { productsAtom } from "../models/product";
-import { generateProductId, validateProductData } from "../utils/productUtils";
+import {
+  filterProducts,
+  generateProductId,
+  validateProductData,
+} from "../utils/productUtils";
 import useFilterSearchParams from "../../hooks/useFilterSearchParams";
 
 export const useProducts = () => {
@@ -56,18 +60,7 @@ export const useProducts = () => {
     [setProducts]
   );
 
-  const filteredProducts = filterSearchParams.searchTerm
-    ? products.filter(
-        (product) =>
-          product.name
-            .toLowerCase()
-            .includes(filterSearchParams.searchTerm?.toLowerCase() ?? "") ||
-          (product.description &&
-            product.description
-              .toLowerCase()
-              .includes(filterSearchParams.searchTerm?.toLowerCase() ?? ""))
-      )
-    : products;
+  const filteredProducts = filterProducts(products, filterSearchParams);
 
   return {
     products,

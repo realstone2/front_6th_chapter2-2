@@ -9,7 +9,7 @@ export default mergeConfig(
     base: "/front_6th_chapter2-2/",
     build: {
       rollupOptions: {
-        input: "./index.advanced.html",
+        input: "./index.html",
       },
       outDir: "dist",
       copyPublicDir: true,

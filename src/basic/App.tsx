@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import { Coupon } from "../types";
 
 import { AdminPage } from "./pages/AdminPage";
@@ -8,6 +8,7 @@ import { Header } from "./components/ui/Header";
 import { NotificationList } from "./components/ui/NotificationList";
 import { useCart } from "./hooks/useCart";
 import { useCoupons } from "./hooks/useCoupons";
+import { useNotifications } from "./hooks/useNotifications";
 import { useProducts } from "./hooks/useProducts";
 
 export interface Notification {
@@ -17,6 +18,11 @@ export interface Notification {
 }
 
 const App = () => {
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  const { notifications, addNotification, setNotifications } =
+    useNotifications();
+
   const {
     products,
     filteredProducts,
@@ -28,21 +34,6 @@ const App = () => {
   const { coupons, addCoupon, removeCoupon } = useCoupons();
 
   const [selectedCoupon, setSelectedCoupon] = useState<Coupon | null>(null);
-
-  const [isAdmin, setIsAdmin] = useState(false);
-
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const addNotification = useCallback(
-    (message: string, type: "error" | "success" | "warning" = "success") => {
-      const id = Date.now().toString();
-      setNotifications((prev) => [...prev, { id, message, type }]);
-
-      setTimeout(() => {
-        setNotifications((prev) => prev.filter((n) => n.id !== id));
-      }, 3000);
-    },
-    []
-  );
 
   const { cart, addToCart, updateCartItemQuantity, removeFromCart, clearCart } =
     useCart();

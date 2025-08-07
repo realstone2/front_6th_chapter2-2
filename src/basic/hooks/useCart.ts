@@ -1,33 +1,9 @@
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import { CartItem, Product } from "../../types";
+import { useLocalStorage } from "./useLocalStorage";
 
 export const useCart = () => {
-  const [cart, _setCart] = useState<CartItem[]>(() => {
-    const saved = localStorage.getItem("cart");
-    if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch {
-        return [];
-      }
-    }
-    return [];
-  });
-
-  const setCart: React.Dispatch<React.SetStateAction<CartItem[]>> = useCallback(
-    (cart) => {
-      _setCart((prev) => {
-        const newValue = typeof cart === "function" ? cart(prev) : cart;
-        if (newValue.length > 0) {
-          localStorage.setItem("cart", JSON.stringify(newValue));
-        } else {
-          localStorage.removeItem("cart");
-        }
-        return newValue;
-      });
-    },
-    [_setCart]
-  );
+  const [cart, setCart] = useLocalStorage<CartItem[]>("cart", []);
 
   // 장바구니에 상품 추가
   const addToCart = useCallback(

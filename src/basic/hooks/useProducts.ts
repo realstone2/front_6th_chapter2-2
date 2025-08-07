@@ -1,35 +1,16 @@
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 
 import useFilterSearchParams from "../../hooks/useFilterSearchParams";
 import { Product } from "../../types";
 import { initialProducts } from "../constants/product";
 import { generateProductId, validateProductData } from "../utils/productUtils";
+import { useLocalStorage } from "./useLocalStorage";
 
 export const useProducts = () => {
-  const [products, _setProducts] = useState<Product[]>(() => {
-    const saved = localStorage.getItem("products");
-    if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch {
-        return initialProducts;
-      }
-    }
-    return initialProducts;
-  });
-
-  const setProducts: React.Dispatch<React.SetStateAction<Product[]>> =
-    useCallback(
-      (products) => {
-        _setProducts((prev) => {
-          const newValue =
-            typeof products === "function" ? products(prev) : products;
-          localStorage.setItem("products", JSON.stringify(newValue));
-          return newValue;
-        });
-      },
-      [_setProducts]
-    );
+  const [products, setProducts] = useLocalStorage<Product[]>(
+    "products",
+    initialProducts
+  );
 
   const { filterSearchParams } = useFilterSearchParams();
 

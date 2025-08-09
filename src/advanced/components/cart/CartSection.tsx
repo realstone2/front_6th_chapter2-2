@@ -1,14 +1,37 @@
 import { Product } from "../../../types";
 import { CartIcon, TrashIcon } from "../icons";
-import { calculateItemTotal } from "../../utils/cartUtils";
+import { calculateItemTotal, getRemainingStock } from "../../utils/cartUtils";
 import { useCart } from "../../hooks/useCart";
+import { useCallback } from "react";
+import { useNotifications } from "../../hooks/useNotifications";
 
-export function CartSection({
-  handleUpdateQuantity,
-}: {
-  handleUpdateQuantity: (product: Product, newQuantity: number) => void;
-}) {
-  const { cart, removeFromCart } = useCart();
+export function CartSection({}: {}) {
+  const { cart, removeFromCart, updateCartItemQuantity } = useCart();
+
+  const { addNotification } = useNotifications();
+
+  // 장바구니 상품 수량 변경 (props로 받은 함수 사용)
+  const handleUpdateQuantity = useCallback(
+    (product: Product, newQuantity: number) => {
+      if (newQuantity <= 0) {
+        removeFromCart(product.id);
+        return;
+      }
+
+      if (newQuantity > product.stock) {
+        addNotification?.(`재고는 ${product.stock}개까지만 있습니다.`, "error");
+        return;
+      }
+
+      if (!getRemainingStock(product, cart)) {
+        addNotification("재고가 부족합니다", "error");
+        return;
+      }
+
+      updateCartItemQuantity(product.id, newQuantity);
+    },
+    [addNotification, cart, removeFromCart, updateCartItemQuantity]
+  );
 
   return (
     <section className="bg-white rounded-lg border border-gray-200 p-4">

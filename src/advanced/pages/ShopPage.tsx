@@ -12,31 +12,8 @@ import { useNotifications } from "../hooks/useNotifications";
 export function ShopPage() {
   const [selectedCoupon, setSelectedCoupon] = useState<Coupon | null>(null);
 
-  const { cart, updateCartItemQuantity, removeFromCart } = useCart();
+  const { cart } = useCart();
   const { addNotification } = useNotifications();
-
-  // 장바구니 상품 수량 변경 (props로 받은 함수 사용)
-  const handleUpdateQuantity = useCallback(
-    (product: Product, newQuantity: number) => {
-      if (newQuantity <= 0) {
-        removeFromCart(product.id);
-        return;
-      }
-
-      if (newQuantity > product.stock) {
-        addNotification?.(`재고는 ${product.stock}개까지만 있습니다.`, "error");
-        return;
-      }
-
-      if (!getRemainingStock(product, cart)) {
-        addNotification("재고가 부족합니다", "error");
-        return;
-      }
-
-      updateCartItemQuantity(product.id, newQuantity);
-    },
-    [addNotification, cart, removeFromCart, updateCartItemQuantity]
-  );
 
   // 쿠폰 적용
   const applyCoupon = useCallback(
@@ -69,7 +46,7 @@ export function ShopPage() {
 
       <div className="lg:col-span-1">
         <div className="sticky top-24 space-y-4">
-          <CartSection handleUpdateQuantity={handleUpdateQuantity} />
+          <CartSection />
 
           {cart.length > 0 && (
             <>
